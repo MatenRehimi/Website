@@ -1,0 +1,57 @@
+input[type='checkbox'] {
+    width:25px;
+    height:25px;
+    background:white;
+    border-radius:5px;
+    border:2px solid #555;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.inner-container {
+  border-top:1px solid #ccc;
+  border-bottom:1px solid #ccc;
+  top:150px;
+  left:50px;
+  right:700px;
+  height:350px;
+  overflow-y: scroll;
+}
+
+#header {
+    width: 100%;
+    background-color: red;
+    height: 30px;
+}
+
+
+#leftBlock {
+  position:absolute;
+  top:150px;
+  left:50px;
+  right:725px;
+  height:490px;
+  border-radius: 25px;
+  border:1px solid #ccc;
+
+}
+#rightBlock {
+    position:absolute;
+    top:150px;
+    left:725px;
+    right:50px;
+    height: 490px;
+    border-radius: 25px;
+    border:1px solid #ccc;
+}
+
+.inputForTask
+{
+    font-size:12pt;
+    position:absolute;
+    top:445px;
+    left:140px;
+    outline-width: 0;
+}
