@@ -16,7 +16,7 @@ ul {
   top:150px;
   left:50px;
   right:700px;
-  height:350px;
+  height:300px;
   overflow-y: scroll;
 }
 
@@ -32,7 +32,7 @@ ul {
   top:150px;
   left:50px;
   right:725px;
-  height:490px;
+  height:450px;
   border-radius: 25px;
   border:1px solid #ccc;
 
@@ -42,7 +42,7 @@ ul {
     top:150px;
     left:725px;
     right:50px;
-    height: 490px;
+    height: 450px;
     border-radius: 25px;
     border:1px solid #ccc;
 }
@@ -51,7 +51,12 @@ ul {
 {
     font-size:12pt;
     position:absolute;
-    top:445px;
+    top:395px;
     left:140px;
     outline-width: 0;
 }
+
+input.firstOption{color:black;}
+input.secondOption{color:red;}
+input.thirdOption{color:black;}
+input.fourthOption{color:red;}
