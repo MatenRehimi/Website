@@ -23,7 +23,7 @@ class TaskList extends React.Component {
   async findTasks() {
     var val;
     //await is needed so val is not undefined
-    await firebase.database().ref('calendar').child(this.props.props.year).child(this.props.props.month).child(this.props.props.day).child(this.state.type).child("tasks")
+    await firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month).child(this.props.props.day)
     .once("value", snapshot => {
       val = snapshot.val()
     })
@@ -34,8 +34,8 @@ class TaskList extends React.Component {
     event.persist();
     console.log(event.target.id);
     if(window.confirm('Are you sure you wish to delete this item?')) {
-      await firebase.database().ref('calendar').child(this.props.props.year).child(this.props.props.month)
-      .child(this.props.props.day).child(this.state.type).child("tasks").update({
+      await firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
+      .child(this.props.props.day).update({
         [event.target.id]:null
       })
       const copyOfTasks = {...this.state.tasks};
@@ -55,8 +55,8 @@ class TaskList extends React.Component {
     if (event.key === "Enter") {
       if (this.state.newTask !== "") {
         console.log("task added")
-        firebase.database().ref('calendar').child(this.props.props.year).child(this.props.props.month)
-        .child(this.props.props.day).child(this.state.type).child("tasks").push(this.state.newTask)
+        firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
+        .child(this.props.props.day).push(this.state.newTask)
         let temp = await this.findTasks(type)
         this.setState({newTask:"", tasks:temp});
       }else{
@@ -68,8 +68,8 @@ class TaskList extends React.Component {
   async getOptionPicked(event) {
     console.log(event.target.value);
     console.log(this.state.type);
-    firebase.database().ref('calendar').child(this.props.props.year).child(this.props.props.month)
-    .child(this.props.props.day).child(this.state.type).child("dayRating").set(event.target.value)
+    firebase.database().ref(this.state.type).child("dayRating").child(this.props.props.year).child(this.props.props.month)
+    .child(this.props.props.day).set(event.target.value)
   }
 
   render() {

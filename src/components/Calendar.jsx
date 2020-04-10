@@ -10,56 +10,33 @@ class Calendar extends React.Component {
     this.state = {
       currentMonth: new Date(),
       selectedDate: new Date(),
-      dayRatings: "",
+      dayRatingSchedule: "",
+      dayRatingGym: "",
       redirect: false
     };
   }
 
   async componentDidMount() {
-    const dayRatings = await this.findDayRatings("Schedule")
+    const dayRatingSchedule = await this.findDayRatings("Schedule")
+    const dayRatingGym = await this.findDayRatings("Gym")
     this.setState({
-      dayRatings:dayRatings
+      dayRatingSchedule:dayRatingSchedule,
+      dayRatingGym:dayRatingGym
     })
-    console.log(dayRatings)
   }
 
   async findDayRatings(type) {
-    const {currentMonth} = this.state;
-    const monthStart = dateFns.startOfMonth(currentMonth);
-    const monthEnd = dateFns.endOfMonth(monthStart);
-    const startDate = dateFns.startOfWeek(monthStart);
-    const endDate = dateFns.endOfWeek(monthEnd);
-    let day = startDate;
-    console.log(day)
-    let x = [];
-
-    while (day < endDate) {
-      if (dateFns.isSameMonth(day,monthStart)) {
-        x.push(await this.findDayRating(day,type))
-      }
-      day = dateFns.addDays(day, 1);
-    }
-    console.log(typeof(x))
-    return x;
-  }
-
-  async findDayRating(day,type) {
-    let val = "";
-    day = dateFns.format(day, "YYYY MM DD");
-    await firebase.database().ref('calendar').child(day.substring(0,4)).child(day.substring(5,7)).child(day.substring(8,10)).child(type).child("dayRating")
+    const {selectedDate} = this.state;
+    let day = dateFns.format(selectedDate,"YYYY MM");
+    let val;
+    await firebase.database().ref(type).child("dayRating").child(day.substring(0,4)).child(day.substring(5,7))
     .once("value",snapshot => {
       if (snapshot.exists()) {
         val = snapshot.val()
-      }else{
-        return ""
       }
     })
-    if(val==="firstOption") { return <div><span style={{color: "black"}}><b>x</b></span></div>}
-    else if (val==="secondOption") { return <div><span style={{color: "Red"}}><b>x</b></span></div>}
-    else if (val==="thirdOption") { return <div><span style={{color: "black"}}>{"✓"}</span></div>}
-    else if (val==="fourthOption") { return <div><span style={{color: "red"}}>{"✓"}</span></div>}
-    else return "";
-  }
+    return val
+}
 
   renderHeader() {
     const dateFormat = "MMMM YYYY";
@@ -97,27 +74,25 @@ class Calendar extends React.Component {
   }
 
   renderCells() {
-    const { currentMonth, selectedDate } = this.state;
+    const { currentMonth, selectedDate,dayRatingSchedule,dayRatingGym } = this.state;
     const monthStart = dateFns.startOfMonth(currentMonth);
     const monthEnd = dateFns.endOfMonth(monthStart);
     const startDate = dateFns.startOfWeek(monthStart);
     const endDate = dateFns.endOfWeek(monthEnd);
 
     const dateFormat = "D";
+    const dayFormat = "DD";
     const rows = [];
 
     let days = [];
     let day = startDate;
     let formattedDate = "";
-    let x = this.state.dayRatings;
-    let p = -1;
+    let formattedDay = "";
 
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         formattedDate = dateFns.format(day, dateFormat);
-        if (dateFns.isSameMonth(day,monthStart)) {
-          p++;
-        }
+        formattedDay = dateFns.format(day,dayFormat);
 
         const cloneDay = day;
         days.push(
@@ -132,7 +107,14 @@ class Calendar extends React.Component {
           >
             <span className="number">{formattedDate}</span>
             <span className="bg">{formattedDate}</span>
-            {dateFns.isSameMonth(day,monthStart) ? x[p] : ""}
+            {dayRatingSchedule[formattedDay]==="firstOption" ? <span style={{color: "black"}}><b>x</b></span> : ""}
+            {dayRatingSchedule[formattedDay]==="secondOption" ? <span style={{color: "Red"}}><b>x</b></span> : ""}
+            {dayRatingSchedule[formattedDay]==="thirdOption" ? <span style={{color: "black"}}>{"✓"}</span> : ""}
+            {dayRatingSchedule[formattedDay]==="fourthOption" ? <span style={{color: "red"}}>{"✓"}</span> : ""}
+            {dayRatingGym[formattedDay]==="firstOption" ? <span style={{color: "black"}}><b>x</b></span> : ""}
+            {dayRatingGym[formattedDay]==="secondOption" ? <span style={{color: "Red"}}><b>x</b></span> : ""}
+            {dayRatingGym[formattedDay]==="thirdOption" ? <span style={{color: "black"}}>{"✓"}</span> : ""}
+            {dayRatingGym[formattedDay]==="fourthOption" ? <span style={{color: "red"}}>{"✓"}</span> : ""}
           </div>
         );
         day = dateFns.addDays(day, 1);
