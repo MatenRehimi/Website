@@ -8,35 +8,35 @@ class TaskList extends React.Component {
     this.state = {
       type : this.props.type,
       tasks : {},
+      dictionaryOfTasks: {},
       newTask : ""
     }
   }
 
   async componentDidMount() {
-    const tasks = await this.findTasks(this.state.type);
-    console.log(tasks);
-    this.setState({
-      tasks:tasks
-    })
+    await this.findTasks(this.state.type);
+
   }
 
   async findTasks() {
-    var val;
     //await is needed so val is not undefined
     await firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month).child(this.props.props.day)
     .once("value", snapshot => {
-      val = snapshot.val()
+      if (snapshot.exists()) {
+        this.setState({
+          tasks:Object.keys(snapshot.val()),
+          dictionaryOfTasks:snapshot.val()
+        })
+      }
     })
-    return val;
   }
 
   async removeTask(event) {
     event.persist();
-    console.log(event.target.id);
     if(window.confirm('Are you sure you wish to delete this item?')) {
       await firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
       .child(this.props.props.day).update({
-        [event.target.id]:null
+        [this.state.tasks[event.target.id]]:null
       })
       const copyOfTasks = {...this.state.tasks};
       delete copyOfTasks[event.target.id];
@@ -51,13 +51,26 @@ class TaskList extends React.Component {
     this.setState({newTask:event.target.value});
   }
 
+  async handleClick(event){
+    let check = "incomplete";
+    if (event.target.checked) {
+      check = "complete"
+    }
+    await firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
+    .child(this.props.props.day).update({
+      [this.state.tasks[event.target.id]]:check
+    })
+  }
+
   async addTask(type,event) {
     if (event.key === "Enter") {
       if (this.state.newTask !== "") {
         console.log("task added")
+        console.log(this.state.newTask)
         firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-        .child(this.props.props.day).push(this.state.newTask)
-        let temp = await this.findTasks(type)
+        .child(this.props.props.day).child(this.state.newTask).set("incomplete")
+        await this.findTasks(type) 
+        let temp = this.state.tasks;
         this.setState({newTask:"", tasks:temp});
       }else{
         alert("Please enter a task!");
@@ -66,8 +79,6 @@ class TaskList extends React.Component {
   }
 
   async getOptionPicked(event) {
-    console.log(event.target.value);
-    console.log(this.state.type);
     firebase.database().ref(this.state.type).child("dayRating").child(this.props.props.year).child(this.props.props.month)
     .child(this.props.props.day).set(event.target.value)
   }
@@ -77,8 +88,10 @@ class TaskList extends React.Component {
     if (tasks) {
       var shownTasks = [];
       for (var task in tasks) {
-        shownTasks.push(<li key={task}> <input id={task} type="checkbox" name="list"
-        onDoubleClick= {this.removeTask.bind(this)}/> {tasks[task]} </li>);
+        shownTasks.push(<li key={task}> <input id={task} type="checkbox"
+        defaultChecked={String("complete") === this.state.dictionaryOfTasks[tasks[task]]} onChange={()=>{}}
+        name="list" onDoubleClick= {this.removeTask.bind(this)} onClick={this.handleClick.bind(this)}/>
+        {tasks[task]} </li>);
       }
     }
     return (
