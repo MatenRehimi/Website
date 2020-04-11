@@ -69,7 +69,7 @@ class TaskList extends React.Component {
         console.log(this.state.newTask)
         firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
         .child(this.props.props.day).child(this.state.newTask).set("incomplete")
-        await this.findTasks(type) 
+        await this.findTasks(type)
         let temp = this.state.tasks;
         this.setState({newTask:"", tasks:temp});
       }else{

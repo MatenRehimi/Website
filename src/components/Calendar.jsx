@@ -7,9 +7,10 @@ class Calendar extends React.Component {
 
   constructor(props) {
     super(props);
+    let date = new Date()
     this.state = {
-      currentMonth: new Date(),
-      selectedDate: new Date(),
+      currentMonth: date,
+      selectedDate: date,
       dayRatingSchedule: "",
       dayRatingGym: "",
       redirect: false
@@ -17,19 +18,19 @@ class Calendar extends React.Component {
   }
 
   async componentDidMount() {
-    const dayRatingSchedule = await this.findDayRatings("Schedule")
-    const dayRatingGym = await this.findDayRatings("Gym")
+    const dayRatingSchedule = await this.findDayRatings("Schedule",this.state.currentMonth)
+    const dayRatingGym = await this.findDayRatings("Gym",this.state.currentMonth)
     this.setState({
       dayRatingSchedule:dayRatingSchedule,
       dayRatingGym:dayRatingGym
     })
   }
 
-  async findDayRatings(type) {
-    const {selectedDate} = this.state;
-    let day = dateFns.format(selectedDate,"YYYY MM");
-    let val;
-    await firebase.database().ref(type).child("dayRating").child(day.substring(0,4)).child(day.substring(5,7))
+  async findDayRatings(type,date) {
+
+    let formattedDay = dateFns.format(date,"YYYY MM");
+    let val = [];
+    await firebase.database().ref(type).child("dayRating").child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
     .once("value",snapshot => {
       if (snapshot.exists()) {
         val = snapshot.val()
@@ -50,7 +51,7 @@ class Calendar extends React.Component {
         <div className="col col-center">
           <span>{dateFns.format(this.state.currentMonth, dateFormat)}</span>
         </div>
-        <div className="col col-end" onClick={this.nextMonth}>
+        <div className="col col-end" onClick={this.nextMonth.bind(this)}>
           <div className="icon">chevron_right</div>
         </div>
       </div>
@@ -74,7 +75,7 @@ class Calendar extends React.Component {
   }
 
   renderCells() {
-    const { currentMonth, selectedDate,dayRatingSchedule,dayRatingGym } = this.state;
+    const {currentMonth, selectedDate,dayRatingSchedule, dayRatingGym} = this.state;
     const monthStart = dateFns.startOfMonth(currentMonth);
     const monthEnd = dateFns.endOfMonth(monthStart);
     const startDate = dateFns.startOfWeek(monthStart);
@@ -92,7 +93,9 @@ class Calendar extends React.Component {
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         formattedDate = dateFns.format(day, dateFormat);
-        formattedDay = dateFns.format(day,dayFormat);
+        if (dateFns.isSameMonth(day,monthStart)){
+          formattedDay = dateFns.format(day,dayFormat);
+        }
 
         const cloneDay = day;
         days.push(
@@ -118,6 +121,7 @@ class Calendar extends React.Component {
           </div>
         );
         day = dateFns.addDays(day, 1);
+        formattedDay = "";
       }
       rows.push(
         <div className="row" key={day}>
@@ -137,15 +141,27 @@ class Calendar extends React.Component {
     });
   };
 
-  nextMonth = () => {
+  nextMonth() {
+    let nextMonth = dateFns.addMonths(this.state.currentMonth,1);
     this.setState({
-      currentMonth: dateFns.addMonths(this.state.currentMonth, 1)
+      currentMonth: nextMonth,
+      dayRatingSchedule: this.findDayRatings("Schedule",nextMonth),
+      dayRatingGym: this.findDayRatings("Gym",nextMonth)
+    }, () => {
+      this.componentDidMount()
     });
-  };
+
+  }
 
   prevMonth = () => {
+    let prevMonth = dateFns.subMonths(this.state.currentMonth, 1);
     this.setState({
-      currentMonth: dateFns.subMonths(this.state.currentMonth, 1)
+      currentMonth: prevMonth,
+      dayRatingSchedule: this.findDayRatings("Schedule",prevMonth),
+      dayRatingGym: this.findDayRatings("Gym",prevMonth)
+
+    }, () => {
+      this.componentDidMount()
     });
   };
 
