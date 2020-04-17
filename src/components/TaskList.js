@@ -109,10 +109,10 @@ class TaskList extends React.Component {
             onKeyDown={this.addTask.bind(this,"schedule")} value={this.state.newTask}
             onChange={this.handleNewTaskChange.bind(this)}/>
             <div onChange={this.getOptionPicked.bind(this)}>
-              <input className="firstOption" type="radio" name="pick" value="firstOption"/><b>x</b>
-              <input className="secondOption" type="radio" name="pick" value="secondOption" /><b>x</b>
-              <input className="thirdOption" type="radio" name="pick" value="thirdOption"/>✓
-              <input className="fourthOption" type="radio" name="pick" value="fourthOption"/>✓
+              <input className="firstOption" type="radio" name="pick" value="firstOption"/><b style={{color:"black"}}>x</b>
+              <input className="secondOption" type="radio" name="pick" value="secondOption"/><b style={{color:"red"}}>x</b>
+              <input className="thirdOption" type="radio" name="pick" value="thirdOption"/><label style={{color:"black"}}>✓</label>
+              <input className="fourthOption" type="radio" name="pick" value="fourthOption"/><label style={{color:"red"}}>✓</label>
             </div>
           </center>
       </div>
