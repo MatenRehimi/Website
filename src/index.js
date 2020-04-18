@@ -7,6 +7,8 @@ import {Route, BrowserRouter, Switch} from "react-router-dom"
 import CalendarPage from "./components/CalendarPage.js";
 import DatePage from "./components/DatePage.js";
 
+var cron = require('node-cron');
+
 class Routing extends React.Component {
 
   //default behaviour
@@ -17,6 +19,10 @@ class Routing extends React.Component {
 
   //exact is used as / overwrites everything else if it is first
   render() {
+    cron.schedule('* * * * 4 *', () => {
+      console.log('running every minute 1, 2, 4 and 5');
+    //  curl 'https://website-4484d.firebaseio.com/.json?format=export' >> output.txt
+    });
     return (
       <BrowserRouter basename={"/"} getUserConfirmation={this.getConfirmation}>
         <Switch>
