@@ -1,6 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 src/Firebase.js
+src/website-4484d-firebase-adminsdk-oayi6-88b4334916.json
 
 # dependencies
 /node_modules
