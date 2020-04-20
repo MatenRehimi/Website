@@ -18,28 +18,35 @@ class Calendar extends React.Component {
   }
 
   async componentDidMount() {
-    const dayRatingSchedule = await this.findDayRatings("Schedule",this.state.currentMonth)
-    const dayRatingGym = await this.findDayRatings("Gym",this.state.currentMonth)
-    this.setState({
-      dayRatingSchedule:dayRatingSchedule,
-      dayRatingGym:dayRatingGym
-    })
+    try {
+      const [currentMonth] = [this.state.currentMonth]
+      const [dayRatingSchedule,dayRatingGym] = await Promise.all([this.findDayRatings("Schedule",currentMonth),this.findDayRatings("Gym",currentMonth)])
+      await this.setState({
+        dayRatingSchedule:dayRatingSchedule,
+        dayRatingGym:dayRatingGym
+      })
+    } catch(error) {
+      console.log(error)
+    }
   }
 
-  async findDayRatings(type,date) {
+  findDayRatings = (type,date) => {
+    return new Promise((resolve, reject) => {
+      const formattedDay = dateFns.format(date,"YYYY MM");
+      let val = [];
+      firebase.database().ref(type).child("dayRating").child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
+      .once("value",snapshot => {
+        if (snapshot.exists()) {
+          val = snapshot.val()
+          resolve(val)
+        }else{
+          reject(val)
+        }
+      })
+    });
+  };
 
-    let formattedDay = dateFns.format(date,"YYYY MM");
-    let val = [];
-    await firebase.database().ref(type).child("dayRating").child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
-    .once("value",snapshot => {
-      if (snapshot.exists()) {
-        val = snapshot.val()
-      }
-    })
-    return val
-}
-
-  renderHeader() {
+  renderHeader = () => {
     const dateFormat = "MMMM YYYY";
     return (
       <div className="header row flex-middle">
@@ -58,7 +65,7 @@ class Calendar extends React.Component {
     );
   }
 
-  renderDays() {
+  renderDays = () => {
     const dateFormat = "dddd";
     const days = [];
 
@@ -74,7 +81,7 @@ class Calendar extends React.Component {
     return <div className="days row">{days}</div>;
   }
 
-  renderCells() {
+  renderCells = () => {
     const {currentMonth, selectedDate,dayRatingSchedule, dayRatingGym} = this.state;
     const monthStart = dateFns.startOfMonth(currentMonth);
     const monthEnd = dateFns.endOfMonth(monthStart);
@@ -141,7 +148,7 @@ class Calendar extends React.Component {
     });
   };
 
-  nextMonth() {
+  nextMonth = () => {
     let nextMonth = dateFns.addMonths(this.state.currentMonth,1);
     this.setState({
       currentMonth: nextMonth,
@@ -165,7 +172,7 @@ class Calendar extends React.Component {
     });
   };
 
-  render() {
+  render = () => {
     if (this.state.redirect) {
       return <Redirect push to={{
         pathname: "/Date",

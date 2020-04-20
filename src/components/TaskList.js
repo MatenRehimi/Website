@@ -84,12 +84,12 @@ class TaskList extends React.Component {
   }
 
   render() {
-    const tasks = this.state.tasks;
+    const [tasks,dictionaryOfTasks] = [this.state];
     if (tasks) {
       var shownTasks = [];
       for (var task in tasks) {
         shownTasks.push(<li key={task}> <input id={task} type="checkbox"
-        defaultChecked={String("complete") === this.state.dictionaryOfTasks[tasks[task]]} onChange={()=>{}}
+        defaultChecked={String("complete") === dictionaryOfTasks[tasks[task]]} onChange={()=>{}}
         name="list" onDoubleClick= {this.removeTask.bind(this)} onClick={this.handleClick.bind(this)}/>
         {tasks[task]} </li>);
       }
