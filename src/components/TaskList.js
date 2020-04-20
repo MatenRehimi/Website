@@ -47,7 +47,7 @@ class TaskList extends React.Component {
     }
   }
 
-  handleNewTaskChange(event) {
+  handleNewTaskChange (event) {
     this.setState({newTask:event.target.value});
   }
 

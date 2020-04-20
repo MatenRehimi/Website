@@ -21,7 +21,7 @@ class Calendar extends React.Component {
     try {
       const [currentMonth] = [this.state.currentMonth]
       const [dayRatingSchedule,dayRatingGym] = await Promise.all([this.findDayRatings("Schedule",currentMonth),this.findDayRatings("Gym",currentMonth)])
-      await this.setState({
+      this.setState({
         dayRatingSchedule:dayRatingSchedule,
         dayRatingGym:dayRatingGym
       })
@@ -30,21 +30,21 @@ class Calendar extends React.Component {
     }
   }
 
-  findDayRatings = (type,date) => {
-    return new Promise((resolve, reject) => {
+  async findDayRatings(type,date) {
+    try {
       const formattedDay = dateFns.format(date,"YYYY MM");
       let val = [];
-      firebase.database().ref(type).child("dayRating").child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
+      await firebase.database().ref(type).child("dayRating").child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
       .once("value",snapshot => {
         if (snapshot.exists()) {
           val = snapshot.val()
-          resolve(val)
-        }else{
-          reject(val)
         }
       })
-    });
-  };
+      return val
+    }catch(error) {
+      console.log(error)
+    }
+}
 
   renderHeader = () => {
     const dateFormat = "MMMM YYYY";
@@ -58,7 +58,7 @@ class Calendar extends React.Component {
         <div className="col col-center">
           <span>{dateFns.format(this.state.currentMonth, dateFormat)}</span>
         </div>
-        <div className="col col-end" onClick={this.nextMonth.bind(this)}>
+        <div className="col col-end" onClick={() => this.nextMonth()}>
           <div className="icon">chevron_right</div>
         </div>
       </div>
@@ -148,7 +148,7 @@ class Calendar extends React.Component {
     });
   };
 
-  nextMonth = () => {
+  nextMonth() {
     let nextMonth = dateFns.addMonths(this.state.currentMonth,1);
     this.setState({
       currentMonth: nextMonth,
