@@ -21,11 +21,9 @@ class DatePage extends React.Component {
     return (
       <div className = "date">
         <header>
-          {
             <h1>
               <center>{formattedDate}</center>
            </h1>
-          }
         </header>
         <main>
           <TaskList type="Schedule" position="leftBlock" props={this.state}/>

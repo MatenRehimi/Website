@@ -7,10 +7,8 @@ class Calendar extends React.Component {
 
   constructor(props) {
     super(props);
-    let date = new Date()
     this.state = {
-      currentMonth: date,
-      selectedDate: date,
+      selectedDate: new Date(),
       dayRatingSchedule: "",
       dayRatingGym: "",
       redirect: false
@@ -19,8 +17,8 @@ class Calendar extends React.Component {
 
   async componentDidMount() {
     try {
-      const [currentMonth] = [this.state.currentMonth]
-      const [dayRatingSchedule,dayRatingGym] = await Promise.all([this.findDayRatings("Schedule",currentMonth),this.findDayRatings("Gym",currentMonth)])
+      const {selectedDate} = this.state
+      const [dayRatingSchedule,dayRatingGym] = await Promise.all([this.findDayRatings("Schedule",selectedDate),this.findDayRatings("Gym",selectedDate)])
       this.setState({
         dayRatingSchedule:dayRatingSchedule,
         dayRatingGym:dayRatingGym
@@ -33,43 +31,43 @@ class Calendar extends React.Component {
   async findDayRatings(type,date) {
     try {
       const formattedDay = dateFns.format(date,"YYYY MM");
-      let val = [];
+      let dayRatings = [];
       await firebase.database().ref(type).child("dayRating").child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
       .once("value",snapshot => {
         if (snapshot.exists()) {
-          val = snapshot.val()
+          dayRatings = snapshot.val()
         }
       })
-      return val
+      return dayRatings
     }catch(error) {
       console.log(error)
     }
 }
 
-  renderHeader = () => {
+  renderHeader() {
     const dateFormat = "MMMM YYYY";
     return (
       <div className="header row flex-middle">
         <div className="col col-start">
-          <div className="icon" onClick={this.prevMonth}>
+          <div className="icon" onClick={this.prevMonth.bind(this)}>
             chevron_left
           </div>
         </div>
         <div className="col col-center">
-          <span>{dateFns.format(this.state.currentMonth, dateFormat)}</span>
+          <span>{dateFns.format(this.state.selectedDate, dateFormat)}</span>
         </div>
-        <div className="col col-end" onClick={() => this.nextMonth()}>
+        <div className="col col-end" onClick={this.nextMonth.bind(this)}>
           <div className="icon">chevron_right</div>
         </div>
       </div>
     );
   }
 
-  renderDays = () => {
+  renderDays() {
     const dateFormat = "dddd";
     const days = [];
 
-    let startDate = dateFns.startOfWeek(this.state.currentMonth);
+    let startDate = dateFns.startOfWeek(this.state.selectedDate);
 
     for (let i = 0; i < 7; i++) {
       days.push(
@@ -81,9 +79,9 @@ class Calendar extends React.Component {
     return <div className="days row">{days}</div>;
   }
 
-  renderCells = () => {
-    const {currentMonth, selectedDate,dayRatingSchedule, dayRatingGym} = this.state;
-    const monthStart = dateFns.startOfMonth(currentMonth);
+  renderCells() {
+    const {selectedDate,dayRatingSchedule, dayRatingGym} = this.state;
+    const monthStart = dateFns.startOfMonth(selectedDate);
     const monthEnd = dateFns.endOfMonth(monthStart);
     const startDate = dateFns.startOfWeek(monthStart);
     const endDate = dateFns.endOfWeek(monthEnd);
@@ -117,31 +115,31 @@ class Calendar extends React.Component {
           >
             <span className="number">{formattedDate}</span>
             <span className="bg">{formattedDate}</span>
-            {dayRatingSchedule[formattedDay]==="firstOption" ? <span style={{color: "black"}}><b>x</b></span> : ""}
-            {dayRatingSchedule[formattedDay]==="secondOption" ? <span style={{color: "Red"}}><b>x</b></span> : ""}
-            {dayRatingSchedule[formattedDay]==="thirdOption" ? <span style={{color: "black"}}>{"✓"}</span> : ""}
-            {dayRatingSchedule[formattedDay]==="fourthOption" ? <span style={{color: "red"}}>{"✓"}</span> : ""}
-            {dayRatingGym[formattedDay]==="firstOption" ? <span style={{color: "black"}}><b>x</b></span> : ""}
-            {dayRatingGym[formattedDay]==="secondOption" ? <span style={{color: "Red"}}><b>x</b></span> : ""}
-            {dayRatingGym[formattedDay]==="thirdOption" ? <span style={{color: "black"}}>{"✓"}</span> : ""}
-            {dayRatingGym[formattedDay]==="fourthOption" ? <span style={{color: "red"}}>{"✓"}</span> : ""}
+            {this.convertOptionsToElements(dayRatingSchedule[formattedDay])}
+            {this.convertOptionsToElements(dayRatingGym[formattedDay])}
           </div>
         );
         day = dateFns.addDays(day, 1);
         formattedDay = "";
       }
-      rows.push(
-        <div className="row" key={day}>
-          {days}
-        </div>
-      );
+      rows.push(<div className="row" key={day}> {days} </div>);
       days = [];
     }
     return <div className="body">{rows}</div>;
   }
 
+  convertOptionsToElements(key) {
+    var dict = {
+      "firstOption": <span style={{color: "black"}}><b>x</b></span>,
+      "secondOption": <span style={{color: "red"}}><b>x</b></span>,
+      "thirdOption": <span style={{color: "black"}}>{"✓"}</span>,
+      "fourthOption": <span style={{color: "red"}}>{"✓"}</span>
+    };
+    return dict[key]
 
-  onDateClick = day => {
+  }
+
+  onDateClick(day) {
     this.setState({
       selectedDate: day,
       redirect: true
@@ -149,9 +147,9 @@ class Calendar extends React.Component {
   };
 
   nextMonth() {
-    let nextMonth = dateFns.addMonths(this.state.currentMonth,1);
+    let nextMonth = dateFns.addMonths(this.state.selectedDate,1);
     this.setState({
-      currentMonth: nextMonth,
+      selectedDate: nextMonth,
       dayRatingSchedule: this.findDayRatings("Schedule",nextMonth),
       dayRatingGym: this.findDayRatings("Gym",nextMonth)
     }, () => {
@@ -160,10 +158,10 @@ class Calendar extends React.Component {
 
   }
 
-  prevMonth = () => {
-    let prevMonth = dateFns.subMonths(this.state.currentMonth, 1);
+  prevMonth() {
+    let prevMonth = dateFns.subMonths(this.state.selectedDate, 1);
     this.setState({
-      currentMonth: prevMonth,
+      selectedDate: prevMonth,
       dayRatingSchedule: this.findDayRatings("Schedule",prevMonth),
       dayRatingGym: this.findDayRatings("Gym",prevMonth)
 
@@ -172,7 +170,7 @@ class Calendar extends React.Component {
     });
   };
 
-  render = () => {
+  render() {
     if (this.state.redirect) {
       return <Redirect push to={{
         pathname: "/Date",

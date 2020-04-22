@@ -15,7 +15,6 @@ class TaskList extends React.Component {
 
   async componentDidMount() {
     await this.findTasks(this.state.type);
-
   }
 
   async findTasks() {
@@ -67,11 +66,12 @@ class TaskList extends React.Component {
       if (this.state.newTask !== "") {
         console.log("task added")
         console.log(this.state.newTask)
-        firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-        .child(this.props.props.day).child(this.state.newTask).set("incomplete")
+        let {type,newTask} = this.state
+        firebase.database().ref(type).child("tasks").child(this.props.props.year).child(this.props.props.month)
+        .child(this.props.props.day).child(newTask).set("incomplete")
         await this.findTasks(type)
-        let temp = this.state.tasks;
-        this.setState({newTask:"", tasks:temp});
+        let {tasks} = this.state.tasks;
+        this.setState({newTask:"", tasks:tasks});
       }else{
         alert("Please enter a task!");
       }
@@ -84,7 +84,7 @@ class TaskList extends React.Component {
   }
 
   render() {
-    const [tasks,dictionaryOfTasks] = [this.state];
+    const {tasks,dictionaryOfTasks} = this.state;
     if (tasks) {
       var shownTasks = [];
       for (var task in tasks) {

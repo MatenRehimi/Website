@@ -7,7 +7,6 @@ import {Route, BrowserRouter, Switch} from "react-router-dom"
 import CalendarPage from "./components/CalendarPage.js";
 import DatePage from "./components/DatePage.js";
 
-
 class Routing extends React.Component {
 
   //default behaviour
