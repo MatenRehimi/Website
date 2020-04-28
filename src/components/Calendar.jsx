@@ -174,7 +174,7 @@ class Calendar extends React.Component {
     if (this.state.redirect) {
       return <Redirect push to={{
         pathname: "/Date",
-        state: { selectedDate: dateFns.format(this.state.selectedDate,'DD/MM/YYYY') }
+        state: { selectedDate: dateFns.format(this.state.selectedDate,'DD/MM/YYYY').toString() }
       }}/>
     }
 

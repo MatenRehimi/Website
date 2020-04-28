@@ -22,7 +22,6 @@ class Routing extends React.Component {
         <Switch>
           <Route path = {"/"} component = {CalendarPage} exact />
           <Route path = {"/Date"} component = {DatePage} />
-          <Route component = {CalendarPage}/>
         </Switch>
       </BrowserRouter>
     );

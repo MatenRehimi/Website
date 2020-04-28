@@ -7,7 +7,7 @@ class DatePage extends React.Component {
   //order of execution: constructor, componentWillMount, render, componentDidMount
   constructor(props) {
     super(props);
-    const tempDate = this.props.location.state.selectedDate.toString();
+    const tempDate = this.props.location.state.selectedDate;
     this.state = {
       day: tempDate.substring(0,2),
       month: tempDate.substring(3,5),
@@ -17,16 +17,16 @@ class DatePage extends React.Component {
   }
 
   renderDatePage() {
-    const formattedDate = this.props.location.state.selectedDate.toString();
+    const {date} = this.state;
     return (
       <div className = "date">
         <header>
             <h1>
-              <center>{formattedDate}</center>
+              <center>{date}</center>
            </h1>
         </header>
         <main>
-          <TaskList type="Schedule" position="leftBlock" props={this.state}/>
+          <TaskList id="leftBlock" type="Schedule" position="leftBlock" props={this.state}/>
           <TaskList type="Gym" position="rightBlock" props={this.state}/>
         </main>
       </div>

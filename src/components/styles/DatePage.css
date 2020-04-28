@@ -26,6 +26,15 @@ ul {
     height: 30px;
 }
 
+/* TaskList  */
+.inputForTask
+{
+    font-size:12pt;
+    position:absolute;
+    top:395px;
+    left:140px;
+    outline-width: 0;
+}
 
 #leftBlock {
   position:absolute;
@@ -46,17 +55,3 @@ ul {
     border-radius: 25px;
     border:1px solid #ccc;
 }
-
-.inputForTask
-{
-    font-size:12pt;
-    position:absolute;
-    top:395px;
-    left:140px;
-    outline-width: 0;
-}
-
-input.firstOption{color:black;}
-input.secondOption{color:red;}
-input.thirdOption{color:black;}
-input.fourthOption{color:red;}
