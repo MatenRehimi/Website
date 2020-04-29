@@ -5,6 +5,9 @@ Babel-Transpiles new JS (react code) to old JS that browsers can use.
 Webpack-Bundles all JS code into a file called bundle.js
 Node_modules=Contains all libraries downdoaded from npm. Not on github as anyone cloning the repository can download the libraries from the package.json file.
 
+Architecture
+![Image description](./Architecture.png)
+
 ##Understanding the progression of JS, babel and webpack.
 https://medium.com/the-node-js-collection/modern-javascript-explained-for-dinosaurs-f695e9747b70
 
