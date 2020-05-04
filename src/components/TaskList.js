@@ -8,9 +8,10 @@ class TaskList extends React.Component {
     this.state = {
       type : this.props.type,
       tasks : {},
-      dictionaryOfTasks: {},
+      dictionaryOfTaskCompletion: {},
       newTask : ""
     }
+
   }
 
   async componentDidMount() {
@@ -24,7 +25,7 @@ class TaskList extends React.Component {
       if (snapshot.exists()) {
         this.setState({
           tasks:Object.keys(snapshot.val()),
-          dictionaryOfTasks:snapshot.val()
+          dictionaryOfTaskCompletion:snapshot.val()
         })
       }
     })
@@ -39,7 +40,7 @@ class TaskList extends React.Component {
       })
       const copyOfTasks = {...this.state.tasks};
       delete copyOfTasks[event.target.id];
-      this.setState({tasks:copyOfTasks});
+      this.setState({tasks:copyOfTasks})
       console.log("deleted");
     }else{
       console.log("not deleted");
@@ -61,7 +62,7 @@ class TaskList extends React.Component {
     })
   }
 
-  async addTask(type,event) {
+  async addTask(event) {
     if (event.key === "Enter") {
       if (this.state.newTask !== "") {
         console.log("task added")
@@ -83,17 +84,67 @@ class TaskList extends React.Component {
     .child(this.props.props.day).set(event.target.value)
   }
 
-  render() {
-    const {tasks,dictionaryOfTasks} = this.state;
-    if (tasks) {
-      var shownTasks = [];
-      for (var task in tasks) {
-        shownTasks.push(<li key={task}> <input id={task} type="checkbox"
-        defaultChecked={String("complete") === dictionaryOfTasks[tasks[task]]} onChange={()=>{}}
-        name="list" onDoubleClick= {this.removeTask.bind(this)} onClick={this.handleClick.bind(this)}/>
-        {tasks[task]} </li>);
-      }
+  dragStart =(event,task)=> {
+    this.draggedItem = task;
+    console.log(this.draggedItem)
+    event.dataTransfer.effectAllowed="move"
+    event.dataTransfer.setData('text/html',event.target.parentNode)
+  }
+
+  dragOver = (e,index,task) => {
+    if (this.draggedItem === task) {
+      return;
     }
+    let updatedDictionaryOfTaskCompletion = this.state.dictionaryOfTaskCompletion;
+    console.log(updatedDictionaryOfTaskCompletion)
+    let temp = updatedDictionaryOfTaskCompletion[task]
+    updatedDictionaryOfTaskCompletion[task]=updatedDictionaryOfTaskCompletion[this.draggedItem]
+    updatedDictionaryOfTaskCompletion[this.draggedItem]=temp
+    console.log(updatedDictionaryOfTaskCompletion)
+
+
+    let tasks = Object.values(this.state.tasks).filter(task => task !== this.draggedItem)
+    tasks.splice(index,0,this.draggedItem)
+    let tasksDictionary = {};
+    for (var counter in tasks) {
+      tasksDictionary[counter]=tasks[counter];
+    }
+    console.log(tasksDictionary)
+    this.setState({tasks:tasksDictionary, dictionaryOfTaskCompletion:updatedDictionaryOfTaskCompletion})
+    console.log(updatedDictionaryOfTaskCompletion)
+  }
+
+  dragEnd = () => {
+    this.draggedIdx = null;
+    let task;
+    console.log("pop")
+    firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
+    .child(this.props.props.day).remove()
+    for (var key in this.state.tasks) {
+      console.log(key)
+      task = this.state.tasks[key]
+      console.log(this.state.dictionaryOfTaskCompletion[this.state.tasks[key]])
+        firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
+        .child(this.props.props.day).child(task).set(this.state.dictionaryOfTaskCompletion[task])
+    }
+
+  }
+
+  render() {
+    const {tasks,dictionaryOfTaskCompletion} = this.state;
+    const listOfTasks = Object.values(tasks);
+
+    var shownTasks = [];
+
+    listOfTasks.map((task,index) => (
+      shownTasks.push(<li key={index-1} draggable="true" onDragStart={e => this.dragStart(e,task)} onDragOver={e => this.dragOver(e,index,task)}
+      onDragEnd={() => this.dragEnd()}>
+      <input id={index} type="checkbox"
+      defaultChecked={String("complete") === dictionaryOfTaskCompletion[task]} onChange={()=>{}}
+      name="list" onDoubleClick= {this.removeTask.bind(this)} onClick={this.handleClick.bind(this)}/>
+      {task} </li>)
+    ))
+
     return (
       <div className="position" id={this.props.position}>
         <h1>
@@ -106,7 +157,7 @@ class TaskList extends React.Component {
         </div>
           <center>
             <input className="inputForTask" type="text" name="task" size="40" autoComplete="off"
-            onKeyDown={this.addTask.bind(this,"schedule")} value={this.state.newTask}
+            onKeyDown={this.addTask.bind(this)} value={this.state.newTask}
             onChange={this.handleNewTaskChange.bind(this)}/>
             <div onChange={this.getOptionPicked.bind(this)}>
               <input className="firstOption" type="radio" name="pick" value="firstOption"/><b style={{color:"black"}}>x</b>
