@@ -8,6 +8,7 @@ class DatePage extends React.Component {
   constructor(props) {
     super(props);
     const tempDate = this.props.location.state.selectedDate;
+    console.log(tempDate)
     this.state = {
       day: tempDate.substring(0,2),
       month: tempDate.substring(3,5),

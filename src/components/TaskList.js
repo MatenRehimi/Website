@@ -1,5 +1,6 @@
 import React from 'react';
 import firebase from '../Firebase';
+import Task from "./Task.js";
 
 class TaskList extends React.Component {
 
@@ -7,167 +8,138 @@ class TaskList extends React.Component {
     super(props);
     this.state = {
       type : this.props.type,
-      tasks : {},
-      dictionaryOfTaskCompletion: {},
-      newTask : ""
+      tasks: []
     }
-
+    this.readDatabase();
   }
 
-  async componentDidMount() {
-    await this.findTasks(this.state.type);
-  }
-
-  async findTasks() {
-    //await is needed so val is not undefined
-    await firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month).child(this.props.props.day)
-    .once("value", snapshot => {
-      if (snapshot.exists()) {
+  readDatabase() {
+    firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month).child(this.props.props.day)
+    .once("value", result => {
+      if (result.exists()) {
+        let tasks = result.val().slice(1,result.val().length)
+        let temp = tasks.map((task,index) => (
+           <Task key={index+1} content={Object.keys(task)[0]} completion={Object.values(task)[0]} />
+        ))
         this.setState({
-          tasks:Object.keys(snapshot.val()),
-          dictionaryOfTaskCompletion:snapshot.val()
+          tasks:temp
         })
       }
     })
   }
 
-  async removeTask(event) {
-    event.persist();
+  writeDatabase() {
+    const {type,tasks} = this.state;
+    firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
+      .child(this.props.props.day).remove();
+    tasks.map((task,index) => (
+      firebase.database().ref(type).child("tasks").child(this.props.props.year).child(this.props.props.month)
+          .child(this.props.props.day).child(index+1).child(task.props.content).set(task.props.completion)
+    ));
+  }
+
+  removeTask(event,index) {
     if(window.confirm('Are you sure you wish to delete this item?')) {
-      await firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-      .child(this.props.props.day).update({
-        [this.state.tasks[event.target.id]]:null
+      let tasks = this.state.tasks;
+      tasks.splice(index,1)
+      this.setState({
+        tasks:tasks
+      }, () => {
+        this.writeDatabase()
       })
-      const copyOfTasks = {...this.state.tasks};
-      delete copyOfTasks[event.target.id];
-      this.setState({tasks:copyOfTasks})
-      console.log("deleted");
-    }else{
-      console.log("not deleted");
     }
   }
 
-  handleNewTaskChange (event) {
-    this.setState({newTask:event.target.value});
-  }
-
-  async handleClick(event){
+  handleClick(event,index){
     let check = "incomplete";
     if (event.target.checked) {
       check = "complete"
     }
-    await firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-    .child(this.props.props.day).update({
-      [this.state.tasks[event.target.id]]:check
+    let tasks = this.state.tasks;
+    let task=tasks[index];
+    tasks[index]=<Task key={index+1} content={task.props.content} completion={check} />
+    this.setState({
+      tasks:tasks
+    }, () => {
+      this.writeDatabase()
     })
   }
 
-  async addTask(event) {
-    if (event.key === "Enter") {
-      if (this.state.newTask !== "") {
-        console.log("task added")
-        console.log(this.state.newTask)
-        let {type,newTask} = this.state
-        firebase.database().ref(type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-        .child(this.props.props.day).child(newTask).set("incomplete")
-        await this.findTasks(type)
-        let {tasks} = this.state;
-        this.setState({newTask:"", tasks:tasks});
-      }else{
-        alert("Please enter a task!");
-      }
+  addTask(event) {
+    if (event.key !== "Enter") {
+      return;
+    }
+    if (event.target.value !== "") {
+      let temp = this.state.tasks;
+      temp.push(<Task key={this.state.tasks.length+1} content={event.target.value} completion="incomplete"/>)
+      this.setState({
+        tasks:temp
+      }, () => {
+        this.writeDatabase()
+      })
+    }else{
+      alert("Please enter a task!");
     }
   }
 
-  async getOptionPicked(event) {
+  getOptionPicked(event) {
     firebase.database().ref(this.state.type).child("dayRating").child(this.props.props.year).child(this.props.props.month)
     .child(this.props.props.day).set(event.target.value)
   }
 
   dragStart =(event,task)=> {
     this.draggedItem = task;
-    console.log(this.draggedItem)
     event.dataTransfer.effectAllowed="move"
     event.dataTransfer.setData('text/html',event.target.parentNode)
+
   }
 
-  dragOver = (e,index,task) => {
-    if (this.draggedItem === task) {
+  dragOver = (e,index,draggedOverTask) => {
+    if (this.draggedItem === draggedOverTask) {
       return;
     }
-    let updatedDictionaryOfTaskCompletion = this.state.dictionaryOfTaskCompletion;
-    console.log(updatedDictionaryOfTaskCompletion)
-    let temp = updatedDictionaryOfTaskCompletion[task]
-    updatedDictionaryOfTaskCompletion[task]=updatedDictionaryOfTaskCompletion[this.draggedItem]
-    updatedDictionaryOfTaskCompletion[this.draggedItem]=temp
-    console.log(updatedDictionaryOfTaskCompletion)
-
-
-    let tasks = Object.values(this.state.tasks).filter(task => task !== this.draggedItem)
+    let tasks = this.state.tasks.filter(x => x !== this.draggedItem);
     tasks.splice(index,0,this.draggedItem)
-    let tasksDictionary = {};
-    for (var counter in tasks) {
-      tasksDictionary[counter]=tasks[counter];
-    }
-    console.log(tasksDictionary)
-    this.setState({tasks:tasksDictionary, dictionaryOfTaskCompletion:updatedDictionaryOfTaskCompletion})
-    console.log(updatedDictionaryOfTaskCompletion)
+    this.setState({tasks})
+
   }
 
   dragEnd = () => {
     this.draggedIdx = null;
-    let task;
-    console.log("pop")
-    firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-    .child(this.props.props.day).remove()
-    for (var key in this.state.tasks) {
-      console.log(key)
-      task = this.state.tasks[key]
-      console.log(this.state.dictionaryOfTaskCompletion[this.state.tasks[key]])
-        firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-        .child(this.props.props.day).child(task).set(this.state.dictionaryOfTaskCompletion[task])
-    }
-
+    this.writeDatabase();
   }
 
   render() {
-    const {tasks,dictionaryOfTaskCompletion} = this.state;
-    const listOfTasks = Object.values(tasks);
-
-    var shownTasks = [];
-
-    listOfTasks.map((task,index) => (
-      shownTasks.push(<li key={index-1} draggable="true" onDragStart={e => this.dragStart(e,task)} onDragOver={e => this.dragOver(e,index,task)}
-      onDragEnd={() => this.dragEnd()}>
-      <input id={index} type="checkbox"
-      defaultChecked={String("complete") === dictionaryOfTaskCompletion[task]} onChange={()=>{}}
-      name="list" onDoubleClick= {this.removeTask.bind(this)} onClick={this.handleClick.bind(this)}/>
-      {task} </li>)
-    ))
 
     return (
-      <div className="position" id={this.props.position}>
-        <h1>
-          <center>{this.state.type}</center>
-        </h1>
-        <div className="inner-container">
-          <ul>
-            {shownTasks}
-          </ul>
+        <div className="position" id={this.props.position}>
+          <h1>
+            <center>{this.state.type}</center>
+          </h1>
+          <div className="inner-container">
+            <ul>
+              {this.state.tasks.map((task,index) => (
+                <li  key={index-1} onInput={e => this.updateTask(e,index)} draggable="true" onDragStart={e => this.dragStart(e,task)} onDragOver={e => this.dragOver(e,index,task)}
+                    onDragEnd={() => this.dragEnd()}>
+                    <input id={index} type="checkbox"
+                    checked={String("complete") === task.props.completion} onChange={()=>{}}
+                    name="list" onDoubleClick= {e => this.removeTask(e,index)} onClick={e => this.handleClick(e,index)}/>
+                    {task} </li>
+              ))}
+            </ul>
+          </div>
+            <center>
+              <input className="inputForTask" type="text" name="task" size="40" autoComplete="off"
+              onKeyDown={e =>this.addTask(e)} />
+              <div onChange={this.getOptionPicked.bind(this)}>
+                <input className="firstOption" type="radio" name="pick" value="firstOption"/><b style={{color:"black"}}>x</b>
+                <input className="secondOption" type="radio" name="pick" value="secondOption"/><b style={{color:"red"}}>x</b>
+                <input className="thirdOption" type="radio" name="pick" value="thirdOption"/><label style={{color:"black"}}>✓</label>
+                <input className="fourthOption" type="radio" name="pick" value="fourthOption"/><label style={{color:"red"}}>✓</label>
+              </div>
+            </center>
         </div>
-          <center>
-            <input className="inputForTask" type="text" name="task" size="40" autoComplete="off"
-            onKeyDown={this.addTask.bind(this)} value={this.state.newTask}
-            onChange={this.handleNewTaskChange.bind(this)}/>
-            <div onChange={this.getOptionPicked.bind(this)}>
-              <input className="firstOption" type="radio" name="pick" value="firstOption"/><b style={{color:"black"}}>x</b>
-              <input className="secondOption" type="radio" name="pick" value="secondOption"/><b style={{color:"red"}}>x</b>
-              <input className="thirdOption" type="radio" name="pick" value="thirdOption"/><label style={{color:"black"}}>✓</label>
-              <input className="fourthOption" type="radio" name="pick" value="fourthOption"/><label style={{color:"red"}}>✓</label>
-            </div>
-          </center>
-      </div>
-    );
+      );
   }
 }
 
