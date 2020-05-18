@@ -9,8 +9,7 @@ class Calendar extends React.Component {
     super(props);
     this.state = {
       selectedDate: new Date(),
-      dayRatingSchedule: "",
-      dayRatingGym: "",
+      dayRating: "",
       redirect: false
     };
   }
@@ -18,10 +17,10 @@ class Calendar extends React.Component {
   async componentDidMount() {
     try {
       const {selectedDate} = this.state
-      const [dayRatingSchedule,dayRatingGym] = await Promise.all([this.findDayRatings("Schedule",selectedDate),this.findDayRatings("Gym",selectedDate)])
+      const [dayRating] = await Promise.all(
+        [this.findDayRatings("dayRating",selectedDate)])
       this.setState({
-        dayRatingSchedule:dayRatingSchedule,
-        dayRatingGym:dayRatingGym
+        dayRating
       })
     } catch(error) {
       console.log(error)
@@ -32,7 +31,7 @@ class Calendar extends React.Component {
     try {
       const formattedDay = dateFns.format(date,"YYYY MM");
       let dayRatings = [];
-      await firebase.database().ref(type).child("dayRating").child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
+      await firebase.database().ref(type).child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
       .once("value",snapshot => {
         if (snapshot.exists()) {
           dayRatings = snapshot.val()
@@ -80,7 +79,8 @@ class Calendar extends React.Component {
   }
 
   renderCells() {
-    const {selectedDate,dayRatingSchedule, dayRatingGym} = this.state;
+    const {selectedDate,dayRating} = this.state;
+    console.log(dayRating)
     const monthStart = dateFns.startOfMonth(selectedDate);
     const monthEnd = dateFns.endOfMonth(monthStart);
     const startDate = dateFns.startOfWeek(monthStart);
@@ -115,8 +115,7 @@ class Calendar extends React.Component {
           >
             <span className="number">{formattedDate}</span>
             <span className="bg">{formattedDate}</span>
-            {this.convertOptionsToElements(dayRatingSchedule[formattedDay])}
-            {this.convertOptionsToElements(dayRatingGym[formattedDay])}
+            {this.convertOptionsToElements(dayRating[formattedDay])}
           </div>
         );
         day = dateFns.addDays(day, 1);
@@ -133,10 +132,10 @@ class Calendar extends React.Component {
       "firstOption": <span style={{color: "black"}}><b>x</b></span>,
       "secondOption": <span style={{color: "red"}}><b>x</b></span>,
       "thirdOption": <span style={{color: "black"}}>{"✓"}</span>,
-      "fourthOption": <span style={{color: "red"}}>{"✓"}</span>
+      "fourthOption": <span style={{color: "red"}}>{"✓"}</span>,
+      "fifthOption": <label style={{color:"red"}}><b>!</b></label>
     };
     return dict[key]
-
   }
 
   onDateClick(day) {
@@ -150,21 +149,17 @@ class Calendar extends React.Component {
     let nextMonth = dateFns.addMonths(this.state.selectedDate,1);
     this.setState({
       selectedDate: nextMonth,
-      dayRatingSchedule: this.findDayRatings("Schedule",nextMonth),
-      dayRatingGym: this.findDayRatings("Gym",nextMonth)
+      dayRating: this.findDayRatings("dayRatings",nextMonth),
     }, () => {
       this.componentDidMount()
     });
-
   }
 
   prevMonth() {
     let prevMonth = dateFns.subMonths(this.state.selectedDate, 1);
     this.setState({
       selectedDate: prevMonth,
-      dayRatingSchedule: this.findDayRatings("Schedule",prevMonth),
-      dayRatingGym: this.findDayRatings("Gym",prevMonth)
-
+      dayRating: this.findDayRatings("dayRatings",prevMonth),
     }, () => {
       this.componentDidMount()
     });

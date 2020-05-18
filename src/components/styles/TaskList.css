@@ -1,0 +1,55 @@
+/* TaskList  */
+.inputForTask
+{
+    font-size:12pt;
+    position:absolute;
+    top:395px;
+    left:60px;
+    outline-width: 0;
+}
+
+.list
+{
+  outline: none;
+}
+
+#leftBlock {
+  position:absolute;
+  top:150px;
+  left:20px;
+  right:1080px;
+  height:450px;
+  border-radius: 25px;
+  border:1px solid #ccc;
+
+}
+
+#leftMiddleBlock {
+  position:absolute;
+  top:150px;
+  left:370px;
+  right:730px;
+  height:450px;
+  border-radius: 25px;
+  border:1px solid #ccc;
+}
+
+#rightMiddleBlock {
+  position:absolute;
+  top:150px;
+  left:720px;
+  right:380px;
+  height:450px;
+  border-radius: 25px;
+  border:1px solid #ccc;
+}
+
+#rightBlock {
+    position:absolute;
+    top:150px;
+    left:1080px;
+    right:20px;
+    height: 450px;
+    border-radius: 25px;
+    border:1px solid #ccc;
+}

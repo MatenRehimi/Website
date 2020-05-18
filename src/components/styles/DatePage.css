@@ -18,7 +18,7 @@ ul {
   right:700px;
   height:300px;
   overflow-y: scroll;
-}
+ }
 
 #header {
     width: 100%;
@@ -26,32 +26,12 @@ ul {
     height: 30px;
 }
 
-/* TaskList  */
-.inputForTask
+.options
 {
-    font-size:12pt;
-    position:absolute;
-    top:395px;
-    left:140px;
-    outline-width: 0;
-}
-
-#leftBlock {
   position:absolute;
-  top:150px;
-  left:50px;
-  right:725px;
-  height:450px;
+  top:625px;
+  left:610px;
   border-radius: 25px;
   border:1px solid #ccc;
-
-}
-#rightBlock {
-    position:absolute;
-    top:150px;
-    left:725px;
-    right:50px;
-    height: 450px;
-    border-radius: 25px;
-    border:1px solid #ccc;
+  padding:10px;
 }

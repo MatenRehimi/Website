@@ -1,6 +1,7 @@
 import React from 'react';
 import firebase from '../Firebase';
 import Task from "./Task.js";
+import './styles/TaskList.css';
 
 class TaskList extends React.Component {
 
@@ -10,6 +11,7 @@ class TaskList extends React.Component {
       type : this.props.type,
       tasks: []
     }
+    this.input = React.createRef();
     this.readDatabase();
   }
 
@@ -66,25 +68,18 @@ class TaskList extends React.Component {
   }
 
   addTask(event) {
-    if (event.key !== "Enter") {
-      return;
-    }
+    if (event.key !== "Enter") { return; }
     if (event.target.value !== "") {
-      let temp = this.state.tasks;
-      temp.push(<Task key={this.state.tasks.length+1} content={event.target.value} completion="incomplete"/>)
+      const newTasks = [...this.state.tasks,<Task key={this.state.tasks.length+1} content={event.target.value} completion="incomplete"/>]
       this.setState({
-        tasks:temp
+        tasks:newTasks
       }, () => {
         this.writeDatabase()
+        this.input.current.value =""
       })
     }else{
       alert("Please enter a task!");
     }
-  }
-
-  getOptionPicked(event) {
-    firebase.database().ref(this.state.type).child("dayRating").child(this.props.props.year).child(this.props.props.month)
-    .child(this.props.props.day).set(event.target.value)
   }
 
   dragStart =(event,task)=> {
@@ -109,6 +104,7 @@ class TaskList extends React.Component {
     this.writeDatabase();
   }
 
+
   render() {
 
     return (
@@ -119,24 +115,18 @@ class TaskList extends React.Component {
           <div className="inner-container">
             <ul>
               {this.state.tasks.map((task,index) => (
-                <li  key={index-1} onInput={e => this.updateTask(e,index)} draggable="true" onDragStart={e => this.dragStart(e,task)} onDragOver={e => this.dragOver(e,index,task)}
-                    onDragEnd={() => this.dragEnd()}>
+                <li id="hi" className="list" key={index-1} draggable="true" onDragStart={e => this.dragStart(e,task)} onDragOver={e => this.dragOver(e,index,task)}
+                    onDragEnd={() => this.dragEnd()} >
                     <input id={index} type="checkbox"
-                    checked={String("complete") === task.props.completion} onChange={()=>{}}
+                    checked={String("complete") === task.props.completion} onChange={() => {}}
                     name="list" onDoubleClick= {e => this.removeTask(e,index)} onClick={e => this.handleClick(e,index)}/>
                     {task} </li>
               ))}
             </ul>
           </div>
             <center>
-              <input className="inputForTask" type="text" name="task" size="40" autoComplete="off"
-              onKeyDown={e =>this.addTask(e)} />
-              <div onChange={this.getOptionPicked.bind(this)}>
-                <input className="firstOption" type="radio" name="pick" value="firstOption"/><b style={{color:"black"}}>x</b>
-                <input className="secondOption" type="radio" name="pick" value="secondOption"/><b style={{color:"red"}}>x</b>
-                <input className="thirdOption" type="radio" name="pick" value="thirdOption"/><label style={{color:"black"}}>✓</label>
-                <input className="fourthOption" type="radio" name="pick" value="fourthOption"/><label style={{color:"red"}}>✓</label>
-              </div>
+              <input className="inputForTask" type="text" name="task" size="20" autoComplete="off"
+              onKeyDown={e =>this.addTask(e)} ref={this.input}/>
             </center>
         </div>
       );
