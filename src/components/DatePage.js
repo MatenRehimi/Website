@@ -9,19 +9,15 @@ class DatePage extends React.Component {
   //order of execution: constructor, componentWillMount, render, componentDidMount
   constructor(props) {
     super(props);
-    const tempDate = this.props.location.state.selectedDate;
+    const tempDate = this.props.location.state.selectedDate.split("/").join("");
     this.state = {
-      day: tempDate.substring(0,2),
-      month: tempDate.substring(3,5),
-      year: tempDate.substring(6,10),
-      date: tempDate
+      date: tempDate,
     }
   }
 
   getOptionPicked(event) {
-    const {day,month,year} = this.state;
-    firebase.database().ref("dayRating").child(year).child(month)
-    .child(day).set(event.target.value)
+    const {date} = this.state;
+    firebase.database().ref("Calendar Page").child(date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)).child("Day Rating").set(event.target.value)
   }
 
   renderDatePage() {
@@ -30,7 +26,7 @@ class DatePage extends React.Component {
       <div className = "date">
         <header>
             <h1>
-              <center>{date}</center>
+              <center>{date.slice(0,2)+"/"+date.slice(2,4)+"/"+date.slice(4,8)}</center>
            </h1>
         </header>
         <main>

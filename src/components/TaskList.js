@@ -16,7 +16,9 @@ class TaskList extends React.Component {
   }
 
   readDatabase() {
-    firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month).child(this.props.props.day)
+    const date = this.props.props.date;
+    const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)
+    firebase.database().ref("Date Page").child(formattedDate).child(this.state.type)
     .once("value", result => {
       if (result.exists()) {
         let tasks = result.val().slice(1,result.val().length)
@@ -32,11 +34,13 @@ class TaskList extends React.Component {
 
   writeDatabase() {
     const {type,tasks} = this.state;
-    firebase.database().ref(this.state.type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-      .child(this.props.props.day).remove();
+    const date = this.props.props.date;
+    const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)
+
+    firebase.database().ref("Date Page").child(formattedDate).child(type).remove();
     tasks.map((task,index) => (
-      firebase.database().ref(type).child("tasks").child(this.props.props.year).child(this.props.props.month)
-          .child(this.props.props.day).child(index+1).child(task.props.content).set(task.props.completion)
+      firebase.database().ref("Date Page").child(formattedDate).child(type)
+          .child(index+1).child(task.props.content).set(task.props.completion)
     ));
   }
 

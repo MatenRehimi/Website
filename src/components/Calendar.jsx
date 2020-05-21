@@ -29,9 +29,9 @@ class Calendar extends React.Component {
 
   async findDayRatings(type,date) {
     try {
-      const formattedDay = dateFns.format(date,"YYYY MM");
+      const formattedDay = dateFns.format(date,"YYYY_MM_");
       let dayRatings = [];
-      await firebase.database().ref(type).child(formattedDay.substring(0,4)).child(formattedDay.substring(5,7))
+        await firebase.database().ref("Calendar Page").orderByKey().startAt(formattedDay+"01").endAt(formattedDay+dateFns.getDaysInMonth(this.state.selectedDate))
       .once("value",snapshot => {
         if (snapshot.exists()) {
           dayRatings = snapshot.val()
@@ -80,14 +80,12 @@ class Calendar extends React.Component {
 
   renderCells() {
     const {selectedDate,dayRating} = this.state;
-    console.log(dayRating)
     const monthStart = dateFns.startOfMonth(selectedDate);
     const monthEnd = dateFns.endOfMonth(monthStart);
     const startDate = dateFns.startOfWeek(monthStart);
     const endDate = dateFns.endOfWeek(monthEnd);
 
     const dateFormat = "D";
-    const dayFormat = "DD";
     const rows = [];
 
     let days = [];
@@ -99,7 +97,7 @@ class Calendar extends React.Component {
       for (let i = 0; i < 7; i++) {
         formattedDate = dateFns.format(day, dateFormat);
         if (dateFns.isSameMonth(day,monthStart)){
-          formattedDay = dateFns.format(day,dayFormat);
+          formattedDay = dateFns.format(day,"YYYY_MM_DD");
         }
 
         const cloneDay = day;
@@ -115,7 +113,9 @@ class Calendar extends React.Component {
           >
             <span className="number">{formattedDate}</span>
             <span className="bg">{formattedDate}</span>
-            {this.convertOptionsToElements(dayRating[formattedDay])}
+            {dayRating[formattedDay]
+              ? this.convertOptionsToElements(Object.values(dayRating[formattedDay]))
+              : ""}
           </div>
         );
         day = dateFns.addDays(day, 1);
@@ -169,7 +169,7 @@ class Calendar extends React.Component {
     if (this.state.redirect) {
       return <Redirect push to={{
         pathname: "/Date",
-        state: { selectedDate: dateFns.format(this.state.selectedDate,'DD/MM/YYYY').toString() }
+        state: { selectedDate: dateFns.format(this.state.selectedDate,'DD/MM/YYYY').toString()}
       }}/>
     }
 
