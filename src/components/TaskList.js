@@ -57,19 +57,21 @@ class TaskList extends React.Component {
   }
 
   handleClick(event,index){
-    let check = "incomplete";
-    if (event.target.checked) {
-      check = "complete"
+      console.log("pressed");
+      console.log(event.target.checked);
+      let check = "incomplete";
+      if (event.target.checked) {
+        check = "complete"
+      }
+      let tasks = this.state.tasks;
+      let task=tasks[index];
+      tasks[index]=<Task key={index+1} content={task.props.content} completion={check} />
+      this.setState({
+        tasks:tasks
+      }, () => {
+        this.writeDatabase()
+      })
     }
-    let tasks = this.state.tasks;
-    let task=tasks[index];
-    tasks[index]=<Task key={index+1} content={task.props.content} completion={check} />
-    this.setState({
-      tasks:tasks
-    }, () => {
-      this.writeDatabase()
-    })
-  }
 
   addTask(event) {
     if (event.key !== "Enter") { return; }
@@ -119,9 +121,9 @@ class TaskList extends React.Component {
           <div className="inner-container">
             <ul>
               {this.state.tasks.map((task,index) => (
-                <li id="hi" className="list" key={index-1} draggable="true" onDragStart={e => this.dragStart(e,task)} onDragOver={e => this.dragOver(e,index,task)}
+                <li className="list" key={index-1} draggable="true" onDragStart={e => this.dragStart(e,task)} onDragOver={e => this.dragOver(e,index,task)}
                     onDragEnd={() => this.dragEnd()} >
-                    <input id={index} type="checkbox"
+                    <input type="checkbox"
                     checked={String("complete") === task.props.completion} onChange={() => {}}
                     name="list" onDoubleClick= {e => this.removeTask(e,index)} onClick={e => this.handleClick(e,index)}/>
                     {task} </li>

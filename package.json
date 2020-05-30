@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.10.0",
     "browserslist": "^4.11.1",
     "caniuse-lite": "^1.0.30001042",
     "date-fns": "^1.30.1",
