@@ -2,6 +2,7 @@ import React from "react";
 import dateFns from "date-fns";
 import {Redirect} from "react-router-dom"
 import firebase from '../Firebase';
+import {getDatabase,ref,query,orderByKey,onValue,startAt,endAt} from 'firebase/database'
 
 class Calendar extends React.Component {
 
@@ -30,14 +31,32 @@ class Calendar extends React.Component {
   async findDayRatings(type,date) {
     try {
       const formattedDay = dateFns.format(date,"YYYY_MM_");
+      const firstDayOfMonth = formattedDay+"01";
+      const lastDayOfMonth = formattedDay+dateFns.getDaysInMonth(this.state.selectedDate);
+      
       let dayRatings = [];
-        await firebase.database().ref("Calendar Page").orderByKey().startAt(formattedDay+"01").endAt(formattedDay+dateFns.getDaysInMonth(this.state.selectedDate))
-      .once("value",snapshot => {
-        if (snapshot.exists()) {
-          dayRatings = snapshot.val()
-        }
+      const db = getDatabase(firebase);
+      const temp = query(ref(db,"Calendar Page"), orderByKey());
+      console.log(temp);
+
+      var testQuery = query(ref(db,"Calendar Page"),orderByKey())
+      var testQuery2 = query(testQuery,startAt(firstDayOfMonth))
+      var testQuery3 = query(testQuery2, endAt(lastDayOfMonth))
+
+      onValue(testQuery3, (snapshot) => {
+        const data = snapshot.val();
+        dayRatings = data;
       })
-      return dayRatings
+
+      return dayRatings;
+
+    //     await firebase.database().ref("Calendar Page").orderByKey().startAt(formattedDay+"01").endAt(formattedDay+dateFns.getDaysInMonth(this.state.selectedDate))
+    //   .once("value",snapshot => {
+    //     if (snapshot.exists()) {
+    //       dayRatings = snapshot.val()
+    //     }
+    //   })
+    //   return dayRatings
     }catch(error) {
       console.log(error)
     }
@@ -78,8 +97,20 @@ class Calendar extends React.Component {
     return <div className="days row">{days}</div>;
   }
 
+  checkValidDayRating(dayRating) {
+    console.log(dayRating)
+    if (dayRating === []) {
+      return false;
+    } 
+    if (dayRating) {
+      return true;
+    }
+    return false;
+  }
+
   renderCells() {
     const {selectedDate,dayRating} = this.state;
+    console.log(dayRating)
     const monthStart = dateFns.startOfMonth(selectedDate);
     const monthEnd = dateFns.endOfMonth(monthStart);
     const startDate = dateFns.startOfWeek(monthStart);

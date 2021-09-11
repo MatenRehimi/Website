@@ -3,6 +3,7 @@ import firebase from '../Firebase';
 import Task from "./Task.js";
 import './styles/TaskList.css';
 
+
 class TaskList extends React.Component {
 
   constructor(props) {
@@ -18,6 +19,7 @@ class TaskList extends React.Component {
   readDatabase() {
     const date = this.props.props.date;
     const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)
+    console.log(firebase.database)
     firebase.database().ref("Date Page").child(formattedDate).child(this.state.type)
     .once("value", result => {
       if (result.exists()) {
