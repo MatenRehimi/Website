@@ -1,7 +1,7 @@
 import React from 'react';
 import firebase from '../Firebase';
 import Task from "./Task.js";
-import {getDatabase,ref,query,orderByKey,onValue,child} from 'firebase/database'
+import {getDatabase,ref,query,onValue,set,remove} from 'firebase/database'
 import './styles/TaskList.css';
 
 
@@ -22,10 +22,10 @@ class TaskList extends React.Component {
     const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)
     const db = getDatabase(firebase);
 
-    const dbRef = ref(db,"Date Page");
+    const dbRef = ref(db,"Date Page/"+formattedDate+"/"+this.state.type);
 
     console.log(formattedDate);
-    const query1 = query(child(dbRef,formattedDate+"/"+this.state.type), orderByKey())
+    const query1 = query(dbRef)
 
     onValue(query1, (snapshot) => {
 
@@ -49,12 +49,12 @@ class TaskList extends React.Component {
     const date = this.props.props.date;
     const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)
 
+    const db = getDatabase(firebase);
+    const dbRef = ref(db,"Date Page/"+formattedDate+"/"+type);
 
-
-    firebase.database().ref("Date Page").child(formattedDate).child(type).remove();
+    remove(dbRef);
     tasks.map((task,index) => (
-      firebase.database().ref("Date Page").child(formattedDate).child(type)
-          .child(index+1).child(task.props.content).set(task.props.completion)
+      set(ref(db,"Date Page/"+formattedDate+"/"+type+"/"+(index+1)+"/"+task.props.content),task.props.completion)
     ));
   }
 
