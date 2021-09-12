@@ -17,6 +17,21 @@ class TaskList extends React.Component {
     this.readDatabase();
   }
 
+  findGroupData = (query) => {
+    return new Promise((resolve,reject) => {
+       onValue(query, (snapshot) => {
+         if (snapshot.exists()) {
+          let tasks = snapshot.val().slice(1,snapshot.val().length)
+          let temp = tasks.map((task,index) => (
+              <Task key={index+1} content={Object.keys(task)[0]} completion={Object.values(task)[0]} />
+          ))
+          resolve(temp);
+         }
+         resolve();
+       })
+    })
+  }
+
   readDatabase() {
     const date = this.props.props.date;
     const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)
@@ -25,22 +40,10 @@ class TaskList extends React.Component {
     const dbRef = ref(db,"Date Page/"+formattedDate+"/"+this.state.type);
 
     console.log(formattedDate);
-    const query1 = query(dbRef)
+    const query1 = query(dbRef);
 
-    onValue(query1, (snapshot) => {
-
-      if (snapshot.exists()) {
-        console.log(snapshot.val())
-        let tasks = snapshot.val().slice(1,snapshot.val().length)
-        let temp = tasks.map((task,index) => (
-            <Task key={index+1} content={Object.keys(task)[0]} completion={Object.values(task)[0]} />
-        ))
-        this.setState({
-                tasks:temp
-              })
-      }else{
-        console.log("No data available")
-      }
+    this.findGroupData(query1).then((temp) => {
+      this.setState({ tasks:temp})
     })
   }
 
