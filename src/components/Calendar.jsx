@@ -15,52 +15,42 @@ class Calendar extends React.Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     try {
       const {selectedDate} = this.state
-      const [dayRating] = await Promise.all(
-        [this.findDayRatings("dayRating",selectedDate)])
-      this.setState({
-        dayRating
+      this.findDayRatings("dayRating",selectedDate).then((dayRating) => {
+        console.log(dayRating)
+        this.setState({dayRating});
       })
+      
     } catch(error) {
       console.log(error)
     }
   }
 
-  async findDayRatings(type,date) {
-    try {
+  findDayRatings = (type,date) => {
+    return new Promise((resolve,reject) => {
       const formattedDay = dateFns.format(date,"YYYY_MM_");
       const firstDayOfMonth = formattedDay+"01";
       const lastDayOfMonth = formattedDay+dateFns.getDaysInMonth(this.state.selectedDate);
       
-      let dayRatings = [];
+      let dayRating = [];
       const db = getDatabase(firebase);
-      const temp = query(ref(db,"Calendar Page"), orderByKey());
-      console.log(temp);
 
-      var testQuery = query(ref(db,"Calendar Page"),orderByKey())
-      var testQuery2 = query(testQuery,startAt(firstDayOfMonth))
-      var testQuery3 = query(testQuery2, endAt(lastDayOfMonth))
+      var query1 = query(ref(db,"Calendar Page"),orderByKey())
+      var query2 = query(query1,startAt(firstDayOfMonth))
+      var query3 = query(query2, endAt(lastDayOfMonth))
 
-      onValue(testQuery3, (snapshot) => {
-        const data = snapshot.val();
-        dayRatings = data;
+      onValue(query3, (snapshot) => {
+        if (snapshot.exists()) {
+          dayRating = snapshot.val();
+          resolve(dayRating)
+        }else{
+          resolve([])
+        }
       })
-
-      return dayRatings;
-
-    //     await firebase.database().ref("Calendar Page").orderByKey().startAt(formattedDay+"01").endAt(formattedDay+dateFns.getDaysInMonth(this.state.selectedDate))
-    //   .once("value",snapshot => {
-    //     if (snapshot.exists()) {
-    //       dayRatings = snapshot.val()
-    //     }
-    //   })
-    //   return dayRatings
-    }catch(error) {
-      console.log(error)
-    }
-}
+    })
+  }
 
   renderHeader() {
     const dateFormat = "MMMM YYYY";
@@ -97,20 +87,8 @@ class Calendar extends React.Component {
     return <div className="days row">{days}</div>;
   }
 
-  checkValidDayRating(dayRating) {
-    console.log(dayRating)
-    if (dayRating === []) {
-      return false;
-    } 
-    if (dayRating) {
-      return true;
-    }
-    return false;
-  }
-
   renderCells() {
     const {selectedDate,dayRating} = this.state;
-    console.log(dayRating)
     const monthStart = dateFns.startOfMonth(selectedDate);
     const monthEnd = dateFns.endOfMonth(monthStart);
     const startDate = dateFns.startOfWeek(monthStart);
@@ -144,6 +122,7 @@ class Calendar extends React.Component {
           >
             <span className="number">{formattedDate}</span>
             <span className="bg">{formattedDate}</span>
+            {/* {console.log("dayRatings:" + dayRating[formattedDay])} */}
             {dayRating[formattedDay]
               ? this.convertOptionsToElements(Object.values(dayRating[formattedDay]))
               : ""}
@@ -192,18 +171,28 @@ class Calendar extends React.Component {
       selectedDate: prevMonth,
       dayRating: this.findDayRatings("dayRatings",prevMonth),
     }, () => {
+      console.log(this.state.dayRating)
       this.componentDidMount()
     });
   };
 
   render() {
+    
+    console.log("render");
+    const {dayRating} = this.state
+    console.log(dayRating)
     if (this.state.redirect) {
       return <Redirect push to={{
         pathname: "/Date",
         state: { selectedDate: dateFns.format(this.state.selectedDate,'DD/MM/YYYY').toString()}
       }}/>
     }
+    
 
+    if (this.state.dayRating == null) {
+      return (<div>Loading</div>)
+    }
+    
     return (
       <div className="calendar">
         {this.renderHeader()}
