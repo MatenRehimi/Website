@@ -19,7 +19,6 @@ class Calendar extends React.Component {
     try {
       const {selectedDate} = this.state
       this.findDayRatings("dayRating",selectedDate).then((dayRating) => {
-        console.log(dayRating)
         this.setState({dayRating});
       })
       
@@ -122,7 +121,6 @@ class Calendar extends React.Component {
           >
             <span className="number">{formattedDate}</span>
             <span className="bg">{formattedDate}</span>
-            {/* {console.log("dayRatings:" + dayRating[formattedDay])} */}
             {dayRating[formattedDay]
               ? this.convertOptionsToElements(Object.values(dayRating[formattedDay]))
               : ""}
@@ -171,16 +169,11 @@ class Calendar extends React.Component {
       selectedDate: prevMonth,
       dayRating: this.findDayRatings("dayRatings",prevMonth),
     }, () => {
-      console.log(this.state.dayRating)
       this.componentDidMount()
     });
   };
 
   render() {
-    
-    console.log("render");
-    const {dayRating} = this.state
-    console.log(dayRating)
     if (this.state.redirect) {
       return <Redirect push to={{
         pathname: "/Date",

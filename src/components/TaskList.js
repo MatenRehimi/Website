@@ -1,6 +1,7 @@
 import React from 'react';
 import firebase from '../Firebase';
 import Task from "./Task.js";
+import {getDatabase,ref,query,orderByKey,onValue,child} from 'firebase/database'
 import './styles/TaskList.css';
 
 
@@ -19,17 +20,26 @@ class TaskList extends React.Component {
   readDatabase() {
     const date = this.props.props.date;
     const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)
-    console.log(firebase.database)
-    firebase.database().ref("Date Page").child(formattedDate).child(this.state.type)
-    .once("value", result => {
-      if (result.exists()) {
-        let tasks = result.val().slice(1,result.val().length)
+    const db = getDatabase(firebase);
+
+    const dbRef = ref(db,"Date Page");
+
+    console.log(formattedDate);
+    const query1 = query(child(dbRef,formattedDate+"/"+this.state.type), orderByKey())
+
+    onValue(query1, (snapshot) => {
+
+      if (snapshot.exists()) {
+        console.log(snapshot.val())
+        let tasks = snapshot.val().slice(1,snapshot.val().length)
         let temp = tasks.map((task,index) => (
-           <Task key={index+1} content={Object.keys(task)[0]} completion={Object.values(task)[0]} />
+            <Task key={index+1} content={Object.keys(task)[0]} completion={Object.values(task)[0]} />
         ))
         this.setState({
-          tasks:temp
-        })
+                tasks:temp
+              })
+      }else{
+        console.log("No data available")
       }
     })
   }
@@ -38,6 +48,8 @@ class TaskList extends React.Component {
     const {type,tasks} = this.state;
     const date = this.props.props.date;
     const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)
+
+
 
     firebase.database().ref("Date Page").child(formattedDate).child(type).remove();
     tasks.map((task,index) => (
