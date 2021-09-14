@@ -27,7 +27,7 @@ class TaskList extends React.Component {
           ))
           resolve(temp);
          }
-         resolve();
+         resolve([]);
        })
     })
   }

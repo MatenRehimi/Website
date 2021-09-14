@@ -2,6 +2,7 @@ import React from 'react';
 import './styles/DatePage.css';
 import TaskList from "./TaskList.js";
 import firebase from '../Firebase';
+import {getDatabase,ref,set} from 'firebase/database'
 
 
 class DatePage extends React.Component {
@@ -17,7 +18,10 @@ class DatePage extends React.Component {
 
   getOptionPicked(event) {
     const {date} = this.state;
-    firebase.database().ref("Calendar Page").child(date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2)).child("Day Rating").set(event.target.value)
+    const db = getDatabase(firebase);
+    const formattedDate = date.slice(4,8)+"_"+date.slice(2,4)+"_"+date.slice(0,2);
+    const dbRef = ref(db,"Calendar Page/"+formattedDate+"/Day Rating");
+    set(dbRef,event.target.value)
   }
 
   renderDatePage() {
