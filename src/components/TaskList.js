@@ -136,7 +136,7 @@ class TaskList extends React.Component {
             <center>{this.state.type}</center>
           </h1>
           <div className="inner-container">
-            <ul>
+            <ul className="unorderedList">
               {this.state.tasks.map((task,index) => (
                 <li className="list" key={index-1} draggable="true" onDragStart={e => this.dragStart(e,task)} onDragOver={e => this.dragOver(e,index,task)}
                     onDragEnd={() => this.dragEnd()} >

@@ -33,6 +33,13 @@ https://stackoverflow.com/questions/43520218/how-to-create-a-tick-mark-in-a-cust
   transition: all .2s;
 } */
 
+.unorderedList
+{
+  margin-left:20px;
+  padding-left: 0;
+}
+
+
 .list
 {
   outline: none;
