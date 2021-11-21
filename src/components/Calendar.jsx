@@ -133,7 +133,8 @@ class Calendar extends React.Component {
       "secondOption": <span style={{color: "red"}}><b>x</b></span>,
       "thirdOption": <span style={{color: "black"}}>{"✓"}</span>,
       "fourthOption": <span style={{color: "red"}}>{"✓"}</span>,
-      "fifthOption": <label style={{color:"red"}}><b>!</b></label>
+      "fifthOption": <label style={{color:"red"}}><b>!</b></label>,
+      "sixthOption": <label style={{color:"red"}}><b></b></label>
     };
     return dict[key]
   }
