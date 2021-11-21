@@ -21,34 +21,15 @@ input[type="checkbox"] {
   outline: none;
 }
 
-#leftBlock {
-  display: inline-block;
-  width: 23%;
-  margin: 1%;
-  border-radius: 25px;
-  border: 1px solid #ccc;
+.test {
+  padding-left: 10px;
 }
 
-#leftMiddleBlock {
-  display: inline-block;
-  width: 23%;
-  margin: 1%;
+.outer-container {
   border-radius: 25px;
   border: 1px solid #ccc;
-}
-
-#rightMiddleBlock {
-  display: inline-block;
-  width: 23%;
-  margin: 1%;
-  border-radius: 25px;
-  border: 1px solid #ccc;
-}
-
-#rightBlock {
-  display: inline-block;
-  width: 23%;
-  margin: 1%;
-  border-radius: 25px;
-  border: 1px solid #ccc;
+  flex-basis: 100%;
+  padding-top:20 px;
+  margin-left: 10px;
+  margin-right:10px
 }

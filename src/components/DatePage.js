@@ -33,10 +33,12 @@ class DatePage extends React.Component {
             <center>{date.slice(0, 2) + "/" + date.slice(2, 4) + "/" + date.slice(4, 8)}</center>
           </h1>
         </header>
-        <TaskList type="Mental" position="leftBlock" props={this.state} />
-        <TaskList type="Physical" position="leftMiddleBlock" props={this.state} />
-        <TaskList type="Health" position="rightMiddleBlock" props={this.state} />
-        <TaskList type="Long Term Goals" position="rightBlock" props={this.state} />
+        <div className="taskListContainer">
+          <TaskList type="Mental"  props={this.state} />
+          <TaskList type="Physical"  props={this.state} />
+          <TaskList type="Health"  props={this.state} />
+          <TaskList type="Long Term Goals"  props={this.state} />
+        </div>
         <center>
           <div className="optionsContainer">
             <div>

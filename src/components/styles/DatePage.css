@@ -28,6 +28,13 @@ ul {
   justify-content: space-evenly;
 }
 
+.taskListContainer {
+
+  display: flex;
+  padding: 20px;
+  justify-content: space-evenly;
+}
+
 .red-label {
   color: red;
   font-weight: bold;
@@ -38,3 +45,5 @@ ul {
   color: black;
   font-weight: bold;
 }
+
+

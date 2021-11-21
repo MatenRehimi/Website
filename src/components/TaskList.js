@@ -141,12 +141,12 @@ class TaskList extends React.Component {
 
   render() {
     return (
-      <div className="position" id={this.props.position}>
+      <div className="outer-container" id={this.props.position}>
         <h1>
           <center>{this.state.type}</center>
         </h1>
         <div className="inner-container">
-          <ul>
+          <ul className = "test">
             {this.state.tasks.map((task, index) => (
               <li
                 className="list"
