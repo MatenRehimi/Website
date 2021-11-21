@@ -14,26 +14,14 @@ class DatePage extends React.Component {
     };
   }
 
-  getOptionPicked(event) {
-    console.log("pop")
-    console.log(event)
+  getOptionPicked(option) {
     const { date } = this.state;
     firebase
       .database()
       .ref("Calendar Page")
       .child(date.slice(4, 8) + "_" + date.slice(2, 4) + "_" + date.slice(0, 2))
       .child("Day Rating")
-      .set(event.target.value);
-  }
-
-  click(event) {
-    const { date } = this.state;
-    firebase
-      .database()
-      .ref("Calendar Page")
-      .child(date.slice(4, 8) + "_" + date.slice(2, 4) + "_" + date.slice(0, 2))
-      .child("Day Rating")
-      .set(event);
+      .set(option);
   }
 
   renderDatePage() {
@@ -52,27 +40,27 @@ class DatePage extends React.Component {
         <center>
           <div className="optionsContainer">
             <div>
-              <input id="firstOption" type="radio" name="options" onClick={() => this.click("firstOption")}/>
+              <input id="firstOption" type="radio" name="options" onClick={() => this.getOptionPicked("firstOption")}/>
               <label className="black-label" htmlFor="firstOption"> x </label>
             </div>
             <div>
-              <input id="secondOption" type="radio" name="options" onClick={() => this.click("secondOption")}/>
+              <input id="secondOption" type="radio" name="options" onClick={() => this.getOptionPicked("secondOption")}/>
               <label className="red-label" htmlFor="secondOption"> x </label>
             </div>
             <div>
-              <input id="thirdOption" type="radio" name="options" onClick={() => this.click("thirdOption")}/>
+              <input id="thirdOption" type="radio" name="options" onClick={() => this.getOptionPicked("thirdOption")}/>
               <label className="black-label" htmlFor="thirdOption"> ✓ </label>
             </div>
             <div>
-              <input id="fourthOption" type="radio" name="options" onClick={() => this.click("fourthOption")}/>
+              <input id="fourthOption" type="radio" name="options" onClick={() => this.getOptionPicked("fourthOption")}/>
               <label className="red-label" htmlFor="fourthOption"> ✓ </label>
             </div>
             <div>
-              <input id="fifthOption" type="radio" name="options" onClick={() => this.click("fifthOption")}/>
+              <input id="fifthOption" type="radio" name="options" onClick={() => this.getOptionPicked("fifthOption")}/>
               <label className="red-label" htmlFor="fifthOption"> ! </label>
             </div>
             <div>
-              <input id="sixthOption" type="radio" name="options" onClick={() => this.click("")}/>
+              <input id="sixthOption" type="radio" name="options" onClick={() => this.getOptionPicked("")}/>
               <label className="black-label" htmlFor="sixthOption"> Clear </label>
             </div>
           </div>
