@@ -1,80 +1,54 @@
 /* TaskList  */
-.inputForTask
-{
-    font-size:12pt;
-    position:absolute;
-    top:395px;
-    left:60px;
-    outline-width: 0;
-    border:1px solid #ccc;
+.inputForTask {
+  font-size: 12pt;
+  display: block;
+  padding: 3px;
+  margin: auto;
+  outline-width: 0;
+  border: 1px solid #ccc;
 }
 
-input[type='checkbox']  {
-    -webkit-appearance: none;
-    width:25px;
-    height:25px;
-    background:white;
-    border-radius:5px;
-    border:2px solid #ccc;
-    zoom: 0.85;
+input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+  background: white;
+  border-radius: 5px;
+  border: 2px solid #ccc;
+  zoom: 0.85;
 }
 
-/*
-https://stackoverflow.com/questions/43520218/how-to-create-a-tick-mark-in-a-custom-checkbox
-/*
-[type="checkbox"]:checked:after {
-  content: '✔';
-  position: absolute;
-  top: 8px;
-  left: 10px;
-  font-size: 24px;
-  line-height: 0.8;
-  color: #fff;
-  transition: all .2s;
-} */
-
-.list
-{
+.list {
   outline: none;
 }
 
 #leftBlock {
-  position:absolute;
-  top:150px;
-  left:20px;
-  right:1080px;
-  height:450px;
+  display: inline-block;
+  width: 23%;
+  margin: 1%;
   border-radius: 25px;
-  border:1px solid #ccc;
-
+  border: 1px solid #ccc;
 }
 
 #leftMiddleBlock {
-  position:absolute;
-  top:150px;
-  left:370px;
-  right:730px;
-  height:450px;
+  display: inline-block;
+  width: 23%;
+  margin: 1%;
   border-radius: 25px;
-  border:1px solid #ccc;
+  border: 1px solid #ccc;
 }
 
 #rightMiddleBlock {
-  position:absolute;
-  top:150px;
-  left:720px;
-  right:380px;
-  height:450px;
+  display: inline-block;
+  width: 23%;
+  margin: 1%;
   border-radius: 25px;
-  border:1px solid #ccc;
+  border: 1px solid #ccc;
 }
 
 #rightBlock {
-    position:absolute;
-    top:150px;
-    left:1080px;
-    right:20px;
-    height: 450px;
-    border-radius: 25px;
-    border:1px solid #ccc;
+  display: inline-block;
+  width: 23%;
+  margin: 1%;
+  border-radius: 25px;
+  border: 1px solid #ccc;
 }
